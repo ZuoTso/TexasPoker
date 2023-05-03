@@ -1,0 +1,89 @@
+    public int getRank() {
+        // TODO: 實現牌型計算邏輯
+    	Arrays.sort(cards);
+
+        boolean flush = isFlush();
+        boolean straight = isStraight();
+
+        if (flush && straight) {
+            return 8; // Straight flush
+        }
+
+        int[] counts = getCounts();
+        int maxCount = getMaxCount(counts);
+
+        if (maxCount == 4) {
+            return 7; // Four of a kind
+        }
+
+        if (maxCount == 3) {
+            if (getMaxCount(getCountsExcludingOneKind(counts)) == 2) {
+                return 6; // Full house
+            }
+            return 3; // Three of a kind
+        }
+
+        if (maxCount == 2) {
+            if (getMaxCount(getCountsExcludingOneKind(counts)) == 2) {
+                return 2; // Two pairs
+            }
+            return 1; // One pair
+        }
+
+        if (flush) {
+            return 5; // Flush
+        }
+
+        if (straight) {
+            return 4; // Straight
+        }
+
+        return 0; // High card
+    }
+
+    private boolean isFlush() {
+        for (int i = 1; i < cards.length; i++) {
+            if (cards[i].getSuit() != cards[0].getSuit()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean isStraight() {
+        for (int i = 1; i < cards.length; i++) {
+            if (cards[i].getRank() != cards[i-1].getRank() + 1) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private int[] getCounts() {
+        int[] counts = new int[15];
+        for (Card card : cards) {
+            counts[card.getRank()]++;
+        }
+        return counts;
+    }
+
+    private int[] getCountsExcludingOneKind(int[] counts) {
+        int[] countsExcludingOneKind = new int[counts.length];
+        System.arraycopy(counts, 0, countsExcludingOneKind, 0, counts.length);
+        for (int i = 2; i < countsExcludingOneKind.length; i++) {
+            if (counts[i] == 1) {
+                countsExcludingOneKind[i] = 0;
+            }
+        }
+        return countsExcludingOneKind;
+    }
+
+    private int getMaxCount(int[] counts) {
+        int maxCount = 0;
+        for (int count : counts) {
+            if (count > maxCount) {
+                maxCount = count;
+            }
+        }
+        return maxCount;
+    }
